@@ -17,6 +17,12 @@ echo "The latest IPFS tag is ${LATEST_IPFS_TAG}"
 if [ "$CURRENT_IPFS_TAG" = "$LATEST_IPFS_TAG" ]; then
     echo "http-api-docs already uses the latest go-ipfs tag."
 else
+     # update installation docs
+     while read -r file; do
+          echo "replacing $CURRENT_IPFS_TAG with $LATEST_IPFS_TAG in $file"
+          sed -E -i "s/$CURRENT_IPFS_TAG/$LATEST_IPFS_TAG/g" $file
+     done <<< "$(grep "current-ipfs-version" ./docs -R --files-with-matches)"
+
      # update http-api-docs
      git checkout -b bump-http-api-docs-ipfs-to-$LATEST_IPFS_TAG
      sed "s/^\s*github.com\/ipfs\/go-ipfs\s\+$CURRENT_IPFS_TAG\s*$/	github.com\/ipfs\/go-ipfs $LATEST_IPFS_TAG/" go.mod > go.mod2
